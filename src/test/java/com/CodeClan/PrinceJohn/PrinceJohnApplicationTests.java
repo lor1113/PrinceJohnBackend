@@ -1,16 +1,15 @@
 package com.CodeClan.PrinceJohn;
 
+import com.CodeClan.PrinceJohn.components.JwtTokenService;
 import com.CodeClan.PrinceJohn.components.UserService;
 import com.CodeClan.PrinceJohn.models.Stock;
 import com.CodeClan.PrinceJohn.models.User;
+import com.CodeClan.PrinceJohn.models.UserSecrets;
 import com.CodeClan.PrinceJohn.repositories.StockRepository;
 import com.CodeClan.PrinceJohn.repositories.UserRepository;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.Assert;
 
@@ -30,6 +29,9 @@ class PrinceJohnApplicationTests {
 	@Autowired
 	UserService userService;
 
+	@Autowired
+	JwtTokenService jwtTokenService;
+
 	@Test
 	void contextLoads() {
 	}
@@ -48,7 +50,7 @@ class PrinceJohnApplicationTests {
 
 	@Test
 	void canSavePortfolio() {
-		User testUser = new User("Jonas","jabba@gmail.com", LocalDate.of(1999, 1, 1));
+		User testUser = new User("Jonas","jabba22@gmail.com", LocalDate.of(1999, 1, 1));
 		userRepository.save(testUser);
 		Stock testStock1 = new Stock("ABC",200F);
 		Stock testStock2 = new Stock("BCD",5F);
@@ -66,7 +68,7 @@ class PrinceJohnApplicationTests {
 
 	@Test
 	void canCalculatePortfolioValue() {
-		User testUser = new User("Jesse","jabba@gmail.com", LocalDate.of(1999, 1, 1));
+		User testUser = new User("Jesse","jabba5@gmail.com", LocalDate.of(1999, 1, 1));
 		Map<String, Integer> testPortfolio = new HashMap<>();
 		Stock testStock1 = new Stock("LOL",200F);
 		Stock testStock2 = new Stock("LEL",5F);
@@ -85,7 +87,7 @@ class PrinceJohnApplicationTests {
 
 	@Test
 	void userCanAddBalance() {
-		User testUser = new User("Jesse","jabba@gmail.com", LocalDate.of(1999, 1, 1));
+		User testUser = new User("Jesse","jabba4@gmail.com", LocalDate.of(1999, 1, 1));
 		testUser.addBalance(100);
 		userRepository.save(testUser);
 		Assert.isTrue(testUser.balance == 100,"Balance must be 100");
@@ -93,32 +95,32 @@ class PrinceJohnApplicationTests {
 
 	@Test
 	void userCanBuyNewStock() {
-		User testUser = new User("Jesse","jabba@gmail.com", LocalDate.of(1999, 1, 1));
+		User testUser = new User("Jesse","jabba3@gmail.com", LocalDate.of(1999, 1, 1));
 		testUser.addBalance(200);
 		Stock testStock2 = new Stock("XXX",5F);
 		stockRepository.save(testStock2);
-		testUser.buyStock(testStock2, 10);
+		testUser.transact(testStock2, 10, true);
 		userRepository.save(testUser);
 		Assert.isTrue(testUser.balance == 150,"Balance must be 150");
 	}
 
 	@Test
 	void userCanBuyOldStock() {
-		User testUser = new User("Jesse","jabba@gmail.com", LocalDate.of(1999, 1, 1));
+		User testUser = new User("Jesse","jabba2@gmail.com", LocalDate.of(1999, 1, 1));
 		testUser.addBalance(200);
 		Stock testStock2 = new Stock("DDD",5F);
 		stockRepository.save(testStock2);
-		testUser.buyStock(testStock2, 10);
+		testUser.transact(testStock2, 10, true);
 		userRepository.save(testUser);
 		Assert.isTrue(testUser.balance == 150,"Balance must be 150");
-		testUser.buyStock(testStock2, 10);
+		testUser.transact(testStock2, 10, true);
 		userRepository.save(testUser);
 		Assert.isTrue(testUser.balance == 100,"Balance must be 100");
 	}
 
 	@Test
 	void userCanUpdatePortfolioHistory () {
-		User testUser = new User("Jesse","jabba@gmail.com", LocalDate.of(1999, 1, 1));
+		User testUser = new User("Jesse","jabba66@gmail.com", LocalDate.of(1999, 1, 1));
 		testUser.portfolio.put("AMZN",10);
 		testUser.portfolio.put("AMD",10);
 		testUser.portfolio.put("AAPL",10);
@@ -128,6 +130,13 @@ class PrinceJohnApplicationTests {
 		userService.updatePortfolioHistory();
 		User testUserUpdated = userService.getUser();
 		userRepository.save(testUserUpdated);
+	}
+
+	@Test
+	void canGenerateJWT () {
+		UserSecrets testSecrets = new UserSecrets(100L,"aaa");
+		String testJWT = jwtTokenService.generateAccessToken(testSecrets,Boolean.TRUE).orElseThrow();
+		System.out.println(testJWT);
 	}
 
 }

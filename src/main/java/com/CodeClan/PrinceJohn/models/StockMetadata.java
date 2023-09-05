@@ -36,7 +36,7 @@ public class StockMetadata {
     }
 
     @Id
-    public Long id;
+    private Long id;
     public LocalDate lastUpdated;
     @ElementCollection
     public List<String> tickerList;
@@ -47,6 +47,6 @@ public class StockMetadata {
         this.tickerList = tickerList;
     }
 
-    public StockMetadata () {};
+    public StockMetadata () {}
 
 }

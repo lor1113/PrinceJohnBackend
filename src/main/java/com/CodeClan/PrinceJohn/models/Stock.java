@@ -43,6 +43,8 @@ public class Stock {
     }
 
     @ElementCollection
+    @MapKeyColumn(name = "price_date")
+    @Column(name = "price_on_date")
     public Map<LocalDate, Float> priceHistory;
 
     @Id

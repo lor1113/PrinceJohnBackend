@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@EnableScheduling
 public class StockService {
     @Autowired
     StockRepository stockRepository;
@@ -38,7 +40,7 @@ public class StockService {
         return stockMetadata;
     }
 
-    @Scheduled(cron = "0 1 * * *")
+    @Scheduled(cron = "0 1 * * * *")
     public void loadStockData () {
         System.out.println("Getting stock data");
         StockMetadata stockMetadata = stockMetadataRepository.findById(1L).orElseGet(this::newStockMetadata);

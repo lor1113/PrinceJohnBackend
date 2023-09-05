@@ -1,12 +1,6 @@
-2023-09-03 18:09:27 jdbc[13]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM USER_PORTFOLIO_VALUE_HISTORY USER_PORTFOLIO [*]USERS"; SQL statement:
-SELECT * FROM USER_PORTFOLIO_VALUE_HISTORY USER_PORTFOLIO USERS [42000-214]
-2023-09-03 18:19:13 jdbc[13]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SCRIPT TO[*]"; expected "INTERSECTS (, NOT, EXISTS, UNIQUE, INTERSECTS"; SQL statement:
-SCRIPT TO [42001-214]
-2023-09-03 18:19:26 jdbc[13]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "test_db.sql" not found; SQL statement:
-SCRIPT TO "test_db.sql" [42122-214]
+2023-09-04 23:40:28 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Column "data.sql" not found; SQL statement:
+SCRIPT TO "data.sql" [42122-214]
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:502)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
 	at org.h2.message.DbException.get(DbException.java:223)

@@ -35,7 +35,7 @@ public class UserService {
             total += (stock.price * quantity);
         }
         return Math.round(total);
-    };
+    }
 
     public void updatePortfolioHistory() {
         LocalDate now = LocalDate.now();

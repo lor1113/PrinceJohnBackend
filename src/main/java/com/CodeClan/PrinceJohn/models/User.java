@@ -3,7 +3,9 @@ package com.CodeClan.PrinceJohn.models;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Entity
 @Table(name = "users")
@@ -55,6 +57,8 @@ public class User {
     }
 
     public LocalDate birthday;
+
+    @Column(unique=true)
     public String email;
 
     public Map<String, Integer> getPortfolio() {
@@ -85,6 +89,8 @@ public class User {
     }
 
     @ElementCollection
+    @MapKeyColumn(name = "value_date")
+    @Column(name = "value_on_date")
     public Map<LocalDate, Float> portfolioValueHistory;
     public int balance;
 
@@ -92,6 +98,17 @@ public class User {
         this.username = username;
         this.birthday = birthday;
         this.email = email;
+        this.balance = 0;
+        this.portfolio = new HashMap<>();
+        this.portfolioValueHistory = new HashMap<>();
+        this.accountCreated = LocalDate.now();
+        this.portfolioHistoryUpdated = LocalDate.now();
+    }
+
+    public User(ProspectiveUser prospectiveUser) {
+        this.username = prospectiveUser.username;
+        this.birthday = prospectiveUser.birthday;
+        this.email = prospectiveUser.email;
         this.balance = 0;
         this.portfolio = new HashMap<>();
         this.portfolioValueHistory = new HashMap<>();
@@ -115,7 +132,7 @@ public class User {
 
     public LocalDate portfolioHistoryUpdated;
 
-    public Boolean buyStock(Stock stock, int quantity) {
+    private Boolean buyStock(Stock stock, int quantity) {
         Float totalPrice = stock.price * quantity;
         if (totalPrice <= this.balance) {
             this.balance -= totalPrice;
@@ -127,7 +144,7 @@ public class User {
         }
     }
 
-    public Boolean sellStock(Stock stock, int quantity) {
+    private Boolean sellStock(Stock stock, int quantity) {
         int owned = Optional.ofNullable(portfolio.get(stock.ticker)).orElse(0);
         if (owned >= quantity) {
             Float totalPrice = stock.price * quantity;
