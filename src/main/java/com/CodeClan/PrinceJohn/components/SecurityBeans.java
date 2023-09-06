@@ -28,16 +28,15 @@ public class SecurityBeans {
     public Optional<RSAKey> loadRSA() {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
             File publicKeyFile = new File("src/main/resources/rsa_public.key");
             byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
             File privateKeyFile = new File("src/main/resources/rsa_private.key");
             byte[] privateKeyBytes = Files.readAllBytes(privateKeyFile.toPath());
-
             EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
             EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
             RSAPublicKey rsa_public = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
             RSAPrivateKey rsa_private = (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
+            System.out.println(rsa_private);
             RSAKey loaded = new RSAKey.Builder(rsa_public).privateKey(rsa_private).build();
             System.out.println("Loaded RSA Keys successfully");
             return Optional.ofNullable(loaded);

@@ -1,14 +1,13 @@
 package com.CodeClan.PrinceJohn.components;
 
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ public class ReplayFilter extends OncePerRequestFilter {
 
     @Scheduled(fixedDelay = 5000)
     public void iterator () {
-        System.out.println("Ding!");
         if (toggle) {
             list2.clear();
             toggle = Boolean.FALSE;
@@ -47,6 +45,10 @@ public class ReplayFilter extends OncePerRequestFilter {
             return;
         }
         long unixTime = System.currentTimeMillis();
+        if (sendDate > unixTime) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
         if ((unixTime - sendDate) > messageLife) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;

@@ -132,7 +132,7 @@ public class User {
 
     public LocalDate portfolioHistoryUpdated;
 
-    private Boolean buyStock(Stock stock, int quantity) {
+    public Boolean buyStock(Stock stock, int quantity) {
         Float totalPrice = stock.price * quantity;
         if (totalPrice <= this.balance) {
             this.balance -= totalPrice;
@@ -144,7 +144,7 @@ public class User {
         }
     }
 
-    private Boolean sellStock(Stock stock, int quantity) {
+    public Boolean sellStock(Stock stock, int quantity) {
         int owned = Optional.ofNullable(portfolio.get(stock.ticker)).orElse(0);
         if (owned >= quantity) {
             Float totalPrice = stock.price * quantity;
@@ -153,14 +153,6 @@ public class User {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
-        }
-    }
-
-    public Boolean transact(Stock stock, int quantity, Boolean buy) {
-        if (buy) {
-            return buyStock(stock, quantity);
-        } else {
-            return sellStock(stock, quantity);
         }
     }
 }

@@ -99,7 +99,7 @@ class PrinceJohnApplicationTests {
 		testUser.addBalance(200);
 		Stock testStock2 = new Stock("XXX",5F);
 		stockRepository.save(testStock2);
-		testUser.transact(testStock2, 10, true);
+		testUser.buyStock(testStock2, 10);
 		userRepository.save(testUser);
 		Assert.isTrue(testUser.balance == 150,"Balance must be 150");
 	}
@@ -110,10 +110,10 @@ class PrinceJohnApplicationTests {
 		testUser.addBalance(200);
 		Stock testStock2 = new Stock("DDD",5F);
 		stockRepository.save(testStock2);
-		testUser.transact(testStock2, 10, true);
+		testUser.buyStock(testStock2, 10);
 		userRepository.save(testUser);
 		Assert.isTrue(testUser.balance == 150,"Balance must be 150");
-		testUser.transact(testStock2, 10, true);
+		testUser.buyStock(testStock2, 10);
 		userRepository.save(testUser);
 		Assert.isTrue(testUser.balance == 100,"Balance must be 100");
 	}

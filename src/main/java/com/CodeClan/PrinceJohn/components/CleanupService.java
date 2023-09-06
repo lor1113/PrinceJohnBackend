@@ -17,7 +17,7 @@ public class CleanupService {
     @Autowired
     ProspectiveUserRepository prospectiveUserRepository;
 
-    @Scheduled(cron = "0 * */2 * * *")
+    @Scheduled(cron = "0 0 */2 * * *")
     public void cleanProspectiveUsers() {
         System.out.println("Cleaning prospective users");
         LocalDateTime now = LocalDateTime.now();

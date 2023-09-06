@@ -1,6 +1,5 @@
 package com.CodeClan.PrinceJohn.components;
 
-import ch.qos.logback.core.encoder.EchoEncoder;
 import com.CodeClan.PrinceJohn.models.UserSecrets;
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JWEAlgorithm;
@@ -47,6 +46,7 @@ public class JwtTokenService {
         JWTClaimsSet jwtClaims = new JWTClaimsSet.Builder()
                 .claim("user_id",userSecrets.Id)
                 .claim("user_email", userSecrets.email)
+                .claim("security_id",userSecrets.getSecurityId())
                 .claim("refresh",refresh)
                 .issuer("PrinceJohn")
                 .issueTime(now)
