@@ -10,13 +10,13 @@ import java.util.Map;
 @Table(name = "stocks")
 public class Stock {
 
-    public String getTicker() {
-        return ticker;
-    }
-
-    public void setTicker(String ticker) {
-        this.ticker = ticker;
-    }
+    @ElementCollection
+    @MapKeyColumn(name = "price_date")
+    @Column(name = "price_on_date")
+    public Map<LocalDate, Float> priceHistory;
+    @Id
+    public String ticker;
+    public Float price;
 
     public Stock(String ticker, Float price) {
         this.ticker = ticker;
@@ -24,7 +24,16 @@ public class Stock {
         this.priceHistory = new HashMap<>();
     }
 
-    public Stock () {}
+    public Stock() {
+    }
+
+    public String getTicker() {
+        return ticker;
+    }
+
+    public void setTicker(String ticker) {
+        this.ticker = ticker;
+    }
 
     public Float getPrice() {
         return price;
@@ -41,13 +50,4 @@ public class Stock {
     public void setPriceHistory(Map<LocalDate, Float> priceHistory) {
         this.priceHistory = priceHistory;
     }
-
-    @ElementCollection
-    @MapKeyColumn(name = "price_date")
-    @Column(name = "price_on_date")
-    public Map<LocalDate, Float> priceHistory;
-
-    @Id
-    public String ticker;
-    public Float price;
 }

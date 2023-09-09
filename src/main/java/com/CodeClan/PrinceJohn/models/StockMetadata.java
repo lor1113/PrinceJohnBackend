@@ -11,6 +11,21 @@ import java.util.List;
 @Entity
 @Table(name = "stock_metadata")
 public class StockMetadata {
+    public LocalDate lastUpdated;
+    @ElementCollection
+    public List<String> tickerList;
+    @Id
+    private Long id;
+
+    public StockMetadata(Long id, LocalDate lastUpdated, List<String> tickerList) {
+        this.id = id;
+        this.lastUpdated = lastUpdated;
+        this.tickerList = tickerList;
+    }
+
+    public StockMetadata() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -34,19 +49,5 @@ public class StockMetadata {
     public void setTickerList(List<String> tickerList) {
         this.tickerList = tickerList;
     }
-
-    @Id
-    private Long id;
-    public LocalDate lastUpdated;
-    @ElementCollection
-    public List<String> tickerList;
-
-    public StockMetadata(Long id, LocalDate lastUpdated, List<String> tickerList) {
-        this.id = id;
-        this.lastUpdated = lastUpdated;
-        this.tickerList = tickerList;
-    }
-
-    public StockMetadata () {}
 
 }

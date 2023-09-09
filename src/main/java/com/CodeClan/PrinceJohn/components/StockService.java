@@ -30,18 +30,21 @@ public class StockService {
 
     @Autowired
     StockMetadataRepository stockMetadataRepository;
+    String nasdaqApiKey = "WW8WRVpoAFoz9VnjyJzB";
+    String nasdaqUrlBase = "https://data.nasdaq.com/api/v3/datasets/WIKI/%s.json?column_index=4&start_date=%s&end_date=%s&api_key=%s";
+    int dayShift = 3000;
 
-    private StockMetadata newStockMetadata () {
+    private StockMetadata newStockMetadata() {
         System.out.println("Stock metadata not found, saving new metadata.");
-        List<String> tickerList = Arrays.asList("AAPL","AMD","AMZN");
-        LocalDate lastUpdated = LocalDate.of(2022,9,1);
-        StockMetadata stockMetadata = new StockMetadata(1L,lastUpdated,tickerList);
+        List<String> tickerList = Arrays.asList("AAPL", "AMD", "AMZN");
+        LocalDate lastUpdated = LocalDate.of(2022, 9, 1);
+        StockMetadata stockMetadata = new StockMetadata(1L, lastUpdated, tickerList);
         stockMetadataRepository.save(stockMetadata);
         return stockMetadata;
     }
 
-    @Scheduled(cron = "0 1 * * * *")
-    public void loadStockData () {
+    @Scheduled(cron = "0 0 1 * * *")
+    public void loadStockData() {
         System.out.println("Getting stock data");
         StockMetadata stockMetadata = stockMetadataRepository.findById(1L).orElseGet(this::newStockMetadata);
         LocalDate now = LocalDate.now();
@@ -56,7 +59,7 @@ public class StockService {
             ObjectMapper mapper = new ObjectMapper()
                     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             for (String ticker : stockMetadata.tickerList) {
-                Stock stock = stockRepository.findByTicker(ticker).orElse(new Stock(ticker,0F));
+                Stock stock = stockRepository.findByTicker(ticker).orElse(new Stock(ticker, 0F));
                 String url = String.format(nasdaqUrlBase, ticker, adjustedLastUpdated, adjustedNow, nasdaqApiKey);
                 String responseString = client.get()
                         .uri(url)
@@ -101,11 +104,6 @@ public class StockService {
         }
 
     }
-
-    String nasdaqApiKey = "WW8WRVpoAFoz9VnjyJzB";
-    String nasdaqUrlBase = "https://data.nasdaq.com/api/v3/datasets/WIKI/%s.json?column_index=4&start_date=%s&end_date=%s&api_key=%s";
-
-    int dayShift = 3000;
 
 
 }

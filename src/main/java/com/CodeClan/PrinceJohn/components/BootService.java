@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("!test")
 public class BootService {
-    @Autowired StockService stockService;
-    @Autowired SecurityBeans securityBeans;
+    @Autowired
+    StockService stockService;
 
     @EventListener
     public void onApplicationEvent(ContextRefreshedEvent event) {

@@ -13,6 +13,23 @@ import java.time.LocalDateTime;
 @Table(name = "prospective_users")
 public class ProspectiveUser {
     public String username;
+    @Column(unique = true)
+    public String email;
+    public LocalDate birthday;
+    public LocalDateTime hashDate;
+    public String passwordHash;
+    @Id
+    public String Id;
+
+    public ProspectiveUser(NewUser newUser) {
+        this.username = newUser.username;
+        this.email = newUser.email;
+        this.birthday = newUser.birthday;
+        newHash();
+    }
+
+    public ProspectiveUser() {
+    }
 
     public String getUsername() {
         return username;
@@ -38,10 +55,6 @@ public class ProspectiveUser {
         this.birthday = birthday;
     }
 
-    @Column(unique=true)
-    public String email;
-    public LocalDate birthday;
-
     public LocalDateTime getHashDate() {
         return hashDate;
     }
@@ -58,8 +71,6 @@ public class ProspectiveUser {
         Id = id;
     }
 
-    public LocalDateTime hashDate;
-
     public String getPasswordHash() {
         return passwordHash;
     }
@@ -68,27 +79,11 @@ public class ProspectiveUser {
         this.passwordHash = passwordHash;
     }
 
-    public String passwordHash;
-
-    public Boolean enable2FA;
-
-    @Id
-    public String Id;
-
-    public ProspectiveUser(NewUser newUser) {
-        this.username = newUser.username;
-        this.email = newUser.email;
-        this.birthday = newUser.birthday;
-        newHash();
-    }
-
-    public void newHash () {
+    public void newHash() {
         SecureRandom rand = new SecureRandom();
         String hash = String.valueOf(this.hashCode());
-        String randomSalt = String.valueOf(rand.nextInt(1000000000));
+        String randomSalt = String.valueOf(rand.nextLong());
         this.hashDate = LocalDateTime.now();
         this.Id = hash + randomSalt;
     }
-
-    public ProspectiveUser () {}
 }

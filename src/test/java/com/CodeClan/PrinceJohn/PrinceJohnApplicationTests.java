@@ -7,6 +7,7 @@ import com.CodeClan.PrinceJohn.models.User;
 import com.CodeClan.PrinceJohn.models.UserSecrets;
 import com.CodeClan.PrinceJohn.repositories.StockRepository;
 import com.CodeClan.PrinceJohn.repositories.UserRepository;
+import com.CodeClan.PrinceJohn.repositories.UserSecretsRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,123 +21,133 @@ import java.util.Map;
 @SpringBootTest
 @ActiveProfiles("test")
 class PrinceJohnApplicationTests {
-	@Autowired
-	StockRepository stockRepository;
+    @Autowired
+    StockRepository stockRepository;
 
-	@Autowired
-	UserRepository userRepository;
+    @Autowired
+    UserRepository userRepository;
 
-	@Autowired
-	UserService userService;
+    @Autowired
+    UserService userService;
 
-	@Autowired
-	JwtTokenService jwtTokenService;
+    @Autowired
+    JwtTokenService jwtTokenService;
 
-	@Test
-	void contextLoads() {
-	}
+    @Autowired
+    UserSecretsRepository userSecretsRepository;
 
-	@Test
-	void canSaveStock() {
-		Stock testStock = new Stock("YYY",10F);
-		stockRepository.save(testStock);
-	}
+    @Test
+    void contextLoads() {
+    }
 
-	@Test
-	void canSaveUser() {
-		User testUser = new User("Lorenzo","Lorenzocurcio2@gmail.com", LocalDate.of(2001, 4, 7));
-		userRepository.save(testUser);
-	}
+    @Test
+    void canSaveStock() {
+        Stock testStock = new Stock("YYY", 10F);
+        stockRepository.save(testStock);
+    }
 
-	@Test
-	void canSavePortfolio() {
-		User testUser = new User("Jonas","jabba22@gmail.com", LocalDate.of(1999, 1, 1));
-		userRepository.save(testUser);
-		Stock testStock1 = new Stock("ABC",200F);
-		Stock testStock2 = new Stock("BCD",5F);
-		Stock testStock3 = new Stock("CBE",20F);
-		stockRepository.save(testStock1);
-		stockRepository.save(testStock2);
-		stockRepository.save(testStock3);
-		Map<String, Integer> testPortfolio = new HashMap<>();
-		testPortfolio.put(testStock1.ticker,3);
-		testPortfolio.put(testStock2.ticker,10);
-		testPortfolio.put(testStock3.ticker,8);
-		testUser.setPortfolio(testPortfolio);
-		userRepository.save(testUser);
-	}
+    @Test
+    void canSaveUser() {
+        User testUser = new User("Lorenzo", "Lorenzocurcio2@gmail.com", LocalDate.of(2001, 4, 7));
+        userRepository.save(testUser);
+        UserSecrets userSecrets = new UserSecrets(testUser.getId(), testUser.email);
+        userSecretsRepository.save(userSecrets);
 
-	@Test
-	void canCalculatePortfolioValue() {
-		User testUser = new User("Jesse","jabba5@gmail.com", LocalDate.of(1999, 1, 1));
-		Map<String, Integer> testPortfolio = new HashMap<>();
-		Stock testStock1 = new Stock("LOL",200F);
-		Stock testStock2 = new Stock("LEL",5F);
-		Stock testStock3 = new Stock("XD",20F);
-		stockRepository.save(testStock1);
-		stockRepository.save(testStock2);
-		stockRepository.save(testStock3);
-		testPortfolio.put(testStock1.ticker,10);
-		testPortfolio.put(testStock2.ticker,10);
-		testPortfolio.put(testStock3.ticker,10);
-		testUser.setPortfolio(testPortfolio);
-		userRepository.save(testUser);
-		userService.setUser(testUser);
-		Assert.isTrue(userService.portfolioValue() == 2250,"Portfolio value must be 2250");
-	}
+    }
 
-	@Test
-	void userCanAddBalance() {
-		User testUser = new User("Jesse","jabba4@gmail.com", LocalDate.of(1999, 1, 1));
-		testUser.addBalance(100);
-		userRepository.save(testUser);
-		Assert.isTrue(testUser.balance == 100,"Balance must be 100");
-	}
+    @Test
+    void canSavePortfolio() {
+        User testUser = new User("Jonas", "jabba22@gmail.com", LocalDate.of(1999, 1, 1));
+        userRepository.save(testUser);
+        Stock testStock1 = new Stock("ABC", 200F);
+        Stock testStock2 = new Stock("BCD", 5F);
+        Stock testStock3 = new Stock("CBE", 20F);
+        stockRepository.save(testStock1);
+        stockRepository.save(testStock2);
+        stockRepository.save(testStock3);
+        Map<String, Integer> testPortfolio = new HashMap<>();
+        testPortfolio.put(testStock1.ticker, 3);
+        testPortfolio.put(testStock2.ticker, 10);
+        testPortfolio.put(testStock3.ticker, 8);
+        testUser.setPortfolio(testPortfolio);
+        userRepository.save(testUser);
+    }
 
-	@Test
-	void userCanBuyNewStock() {
-		User testUser = new User("Jesse","jabba3@gmail.com", LocalDate.of(1999, 1, 1));
-		testUser.addBalance(200);
-		Stock testStock2 = new Stock("XXX",5F);
-		stockRepository.save(testStock2);
-		testUser.buyStock(testStock2, 10);
-		userRepository.save(testUser);
-		Assert.isTrue(testUser.balance == 150,"Balance must be 150");
-	}
+    @Test
+    void canCalculatePortfolioValue() {
+        User testUser = new User("Jesse", "jabba5@gmail.com", LocalDate.of(1999, 1, 1));
+        Map<String, Integer> testPortfolio = new HashMap<>();
+        Stock testStock1 = new Stock("LOL", 200F);
+        Stock testStock2 = new Stock("LEL", 5F);
+        Stock testStock3 = new Stock("XD", 20F);
+        stockRepository.save(testStock1);
+        stockRepository.save(testStock2);
+        stockRepository.save(testStock3);
+        testPortfolio.put(testStock1.ticker, 10);
+        testPortfolio.put(testStock2.ticker, 10);
+        testPortfolio.put(testStock3.ticker, 10);
+        testUser.setPortfolio(testPortfolio);
+        userRepository.save(testUser);
+        userService.setUser(testUser);
+        Assert.isTrue(userService.portfolioValue() == 2250, "Portfolio value must be 2250");
+    }
 
-	@Test
-	void userCanBuyOldStock() {
-		User testUser = new User("Jesse","jabba2@gmail.com", LocalDate.of(1999, 1, 1));
-		testUser.addBalance(200);
-		Stock testStock2 = new Stock("DDD",5F);
-		stockRepository.save(testStock2);
-		testUser.buyStock(testStock2, 10);
-		userRepository.save(testUser);
-		Assert.isTrue(testUser.balance == 150,"Balance must be 150");
-		testUser.buyStock(testStock2, 10);
-		userRepository.save(testUser);
-		Assert.isTrue(testUser.balance == 100,"Balance must be 100");
-	}
+    @Test
+    void userCanAddBalance() {
+        User testUser = new User("Jesse", "jabba4@gmail.com", LocalDate.of(1999, 1, 1));
+        testUser.addBalance(100);
+        userRepository.save(testUser);
+        Assert.isTrue(testUser.balance == 100, "Balance must be 100");
+    }
 
-	@Test
-	void userCanUpdatePortfolioHistory () {
-		User testUser = new User("Jesse","jabba66@gmail.com", LocalDate.of(1999, 1, 1));
-		testUser.portfolio.put("AMZN",10);
-		testUser.portfolio.put("AMD",10);
-		testUser.portfolio.put("AAPL",10);
-		testUser.portfolioHistoryUpdated = LocalDate.now().minusDays(250);
-		userRepository.save(testUser);
-		userService.setUser(testUser);
-		userService.updatePortfolioHistory();
-		User testUserUpdated = userService.getUser();
-		userRepository.save(testUserUpdated);
-	}
+    @Test
+    void userCanBuyNewStock() {
+        User testUser = new User("Jesse", "jabba3@gmail.com", LocalDate.of(1999, 1, 1));
+        testUser.addBalance(200);
+        Stock testStock2 = new Stock("XXX", 5F);
+        stockRepository.save(testStock2);
+        Map<Stock, Integer> buyOrder = new HashMap<>();
+        buyOrder.put(testStock2, 10);
+        testUser.buyStock(buyOrder);
+        userRepository.save(testUser);
+        Assert.isTrue(testUser.balance == 150, "Balance must be 150");
+    }
 
-	@Test
-	void canGenerateJWT () {
-		UserSecrets testSecrets = new UserSecrets(100L,"aaa");
-		String testJWT = jwtTokenService.generateAccessToken(testSecrets,Boolean.TRUE).orElseThrow();
-		System.out.println(testJWT);
-	}
+    @Test
+    void userCanBuyOldStock() {
+        User testUser = new User("Jesse", "jabba2@gmail.com", LocalDate.of(1999, 1, 1));
+        testUser.addBalance(200);
+        Stock testStock2 = new Stock("DDD", 5F);
+        stockRepository.save(testStock2);
+        Map<Stock, Integer> buyOrder = new HashMap<>();
+        buyOrder.put(testStock2, 10);
+        testUser.buyStock(buyOrder);
+        userRepository.save(testUser);
+        Assert.isTrue(testUser.balance == 150, "Balance must be 150");
+        testUser.buyStock(buyOrder);
+        userRepository.save(testUser);
+        Assert.isTrue(testUser.balance == 100, "Balance must be 100");
+    }
+
+    @Test
+    void userCanUpdatePortfolioHistory() {
+        User testUser = new User("Jesse", "jabba66@gmail.com", LocalDate.of(1999, 1, 1));
+        testUser.portfolio.put("AMZN", 10);
+        testUser.portfolio.put("AMD", 10);
+        testUser.portfolio.put("AAPL", 10);
+        testUser.portfolioHistoryUpdated = LocalDate.now().minusDays(250);
+        userRepository.save(testUser);
+        userService.setUser(testUser);
+        userService.updatePortfolioHistory();
+        User testUserUpdated = userService.getUser();
+        userRepository.save(testUserUpdated);
+    }
+
+    @Test
+    void canGenerateJWT() {
+        UserSecrets testSecrets = userSecretsRepository.findByEmail("Lorenzocurcio2@gmail.com").orElseThrow();
+        String testJWT = jwtTokenService.generateAccessToken(testSecrets, Boolean.FALSE).orElseThrow();
+        System.out.println(testJWT);
+    }
 
 }

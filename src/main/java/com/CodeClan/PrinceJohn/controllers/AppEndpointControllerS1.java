@@ -53,4 +53,11 @@ public class AppEndpointControllerS1 {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<Long> testFunction(Principal principal) {
+        Long id = Long.valueOf(principal.getName());
+        return new ResponseEntity<>(id, HttpStatus.OK);
+    }
+
 }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,17 +22,16 @@ import java.util.UUID;
 @Component
 public class JwtTokenService {
 
-    @Autowired SecurityBeans securityBeans;
     private static final long EXPIRE_DURATION_ACCESS = 4 * 60 * 60 * 1000; // 4 hours.
     private static final long EXPIRE_DURATION_REFRESH = 10 * 24 * 60 * 60 * 1000; // 10 days.
-
+    @Autowired
+    SecurityBeans securityBeans;
     private RSAKey rsaKey;
 
     @PostConstruct
-    private void getRSA () {
+    private void getRSA() {
         securityBeans.checkRSA();
-        RSAKey rsaLoaded = securityBeans.loadRSA().orElseThrow();
-        this.rsaKey = rsaLoaded;
+        this.rsaKey = securityBeans.loadRSA().orElseThrow();
         System.out.println("Loaded RSA keys for JWT");
     }
 
@@ -40,14 +40,14 @@ public class JwtTokenService {
         if (refresh) {
             expiration = EXPIRE_DURATION_REFRESH;
         } else {
-            expiration= EXPIRE_DURATION_ACCESS;
+            expiration = EXPIRE_DURATION_ACCESS;
         }
         Date now = new Date();
         JWTClaimsSet jwtClaims = new JWTClaimsSet.Builder()
-                .claim("user_id",userSecrets.Id)
+                .claim("user_id", userSecrets.Id)
                 .claim("user_email", userSecrets.email)
-                .claim("security_id",userSecrets.getSecurityId())
-                .claim("refresh",refresh)
+                .claim("security_id", userSecrets.getSecurityId())
+                .claim("refresh", refresh)
                 .issuer("PrinceJohn")
                 .issueTime(now)
                 .notBeforeTime(now)
@@ -63,13 +63,33 @@ public class JwtTokenService {
             EncryptedJWT jwt = new EncryptedJWT(header, jwtClaims);
             RSAEncrypter encrypter = new RSAEncrypter(rsaKey.toRSAPublicKey());
             jwt.encrypt(encrypter);
-            Optional<String > jwtString = Optional.of(jwt.serialize());
-            return jwtString;
+            return Optional.of(jwt.serialize());
         } catch (Exception e) {
             return Optional.empty();
         }
-
     }
+
+    public Optional<String> generateCustomToken(Map<String, Object> claims) {
+        JWTClaimsSet.Builder jwtBuilder = new JWTClaimsSet.Builder();
+        for (Map.Entry<String, Object> entry : claims.entrySet()) {
+            jwtBuilder.claim(entry.getKey(), entry.getValue());
+        }
+        jwtBuilder.jwtID(UUID.randomUUID().toString());
+        JWTClaimsSet jwtClaims = jwtBuilder.build();
+        JWEHeader header = new JWEHeader(
+                JWEAlgorithm.RSA_OAEP_256,
+                EncryptionMethod.A128GCM
+        );
+        try {
+            EncryptedJWT jwt = new EncryptedJWT(header, jwtClaims);
+            RSAEncrypter encrypter = new RSAEncrypter(rsaKey.toRSAPublicKey());
+            jwt.encrypt(encrypter);
+            return Optional.of(jwt.serialize());
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
     public Optional<JWTClaimsSet> decryptToken(String token) {
         try {
             EncryptedJWT jwt = EncryptedJWT.parse(token);

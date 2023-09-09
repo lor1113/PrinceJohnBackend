@@ -11,6 +11,53 @@ import java.util.Optional;
 @Table(name = "users")
 public class User {
 
+    public String username;
+    public LocalDate birthday;
+    @Column(unique = true)
+    public String email;
+    @ElementCollection
+    @MapKeyColumn(name = "stock_ticker")
+    @Column(name = "quantity")
+    public Map<String, Integer> portfolio;
+    @ElementCollection
+    @MapKeyColumn(name = "value_date")
+    @Column(name = "value_on_date")
+    public Map<LocalDate, Float> portfolioValueHistory;
+    public float balance;
+    public long lastTransaction;
+    public LocalDate accountCreated;
+    public LocalDate portfolioHistoryUpdated;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    public User(String username, String email, LocalDate birthday) {
+        this.username = username;
+        this.birthday = birthday;
+        this.email = email;
+        this.balance = 0F;
+        this.portfolio = new HashMap<>();
+        this.portfolioValueHistory = new HashMap<>();
+        this.accountCreated = LocalDate.now();
+        this.portfolioHistoryUpdated = LocalDate.now();
+        this.lastTransaction = 0L;
+    }
+
+    public User(ProspectiveUser prospectiveUser) {
+        this.username = prospectiveUser.username;
+        this.birthday = prospectiveUser.birthday;
+        this.email = prospectiveUser.email;
+        this.balance = 0;
+        this.portfolio = new HashMap<>();
+        this.portfolioValueHistory = new HashMap<>();
+        this.accountCreated = LocalDate.now();
+        this.portfolioHistoryUpdated = LocalDate.now();
+        this.lastTransaction = 0L;
+    }
+
+    public User() {
+    }
+
     public Long getId() {
         return id;
     }
@@ -18,11 +65,6 @@ public class User {
     public void setId(Long id) {
         this.id = id;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    public String username;
 
     public String getUsername() {
         return username;
@@ -48,18 +90,13 @@ public class User {
         this.email = email;
     }
 
-    public int getBalance() {
+    public float getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(float balance) {
         this.balance = balance;
     }
-
-    public LocalDate birthday;
-
-    @Column(unique=true)
-    public String email;
 
     public Map<String, Integer> getPortfolio() {
         return portfolio;
@@ -68,9 +105,6 @@ public class User {
     public void setPortfolio(Map<String, Integer> portfolio) {
         this.portfolio = portfolio;
     }
-
-    @ElementCollection
-    public Map<String, Integer> portfolio;
 
     public Map<LocalDate, Float> getPortfolioValueHistory() {
         return portfolioValueHistory;
@@ -88,37 +122,9 @@ public class User {
         this.portfolioHistoryUpdated = portfolioHistoryUpdated;
     }
 
-    @ElementCollection
-    @MapKeyColumn(name = "value_date")
-    @Column(name = "value_on_date")
-    public Map<LocalDate, Float> portfolioValueHistory;
-    public int balance;
-
-    public User(String username, String email, LocalDate birthday) {
-        this.username = username;
-        this.birthday = birthday;
-        this.email = email;
-        this.balance = 0;
-        this.portfolio = new HashMap<>();
-        this.portfolioValueHistory = new HashMap<>();
-        this.accountCreated = LocalDate.now();
-        this.portfolioHistoryUpdated = LocalDate.now();
+    public void addBalance(float deposit) {
+        this.balance = this.balance + deposit;
     }
-
-    public User(ProspectiveUser prospectiveUser) {
-        this.username = prospectiveUser.username;
-        this.birthday = prospectiveUser.birthday;
-        this.email = prospectiveUser.email;
-        this.balance = 0;
-        this.portfolio = new HashMap<>();
-        this.portfolioValueHistory = new HashMap<>();
-        this.accountCreated = LocalDate.now();
-        this.portfolioHistoryUpdated = LocalDate.now();
-    }
-
-    public User () {}
-
-    public void addBalance (int deposit) {this.balance = this.balance + deposit;}
 
     public LocalDate getAccountCreated() {
         return accountCreated;
@@ -128,31 +134,70 @@ public class User {
         this.accountCreated = accountCreated;
     }
 
-    public LocalDate accountCreated;
-
-    public LocalDate portfolioHistoryUpdated;
-
-    public Boolean buyStock(Stock stock, int quantity) {
-        Float totalPrice = stock.price * quantity;
+    public Boolean buyStock(Map<Stock, Integer> orderList) {
+        float totalPrice = 0F;
+        for (Map.Entry<Stock, Integer> entry : orderList.entrySet()) {
+            Stock stock = entry.getKey();
+            Integer quantity = entry.getValue();
+            if (quantity < 1) {
+                return Boolean.FALSE;
+            }
+            totalPrice += (stock.price * quantity);
+        }
         if (totalPrice <= this.balance) {
             this.balance -= totalPrice;
-            int owned = Optional.ofNullable(portfolio.get(stock.ticker)).orElse(0);
-            portfolio.put(stock.ticker, owned + quantity);
+            for (Map.Entry<Stock, Integer> entry : orderList.entrySet()) {
+                Stock stock = entry.getKey();
+                Integer quantity = entry.getValue();
+                int owned = Optional.ofNullable(portfolio.get(stock.ticker)).orElse(0);
+                portfolio.put(stock.ticker, owned + quantity);
+            }
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
         }
     }
 
-    public Boolean sellStock(Stock stock, int quantity) {
-        int owned = Optional.ofNullable(portfolio.get(stock.ticker)).orElse(0);
-        if (owned >= quantity) {
-            Float totalPrice = stock.price * quantity;
-            portfolio.put(stock.ticker, owned - quantity);
+    public Boolean sellStock(Map<Stock, Integer> orderList) {
+        boolean canSell = Boolean.TRUE;
+        float totalPrice = 0F;
+        for (Map.Entry<Stock, Integer> entry : orderList.entrySet()) {
+            Stock stock = entry.getKey();
+            Integer quantity = entry.getValue();
+            if (quantity < 1) {
+                return Boolean.FALSE;
+            }
+            int owned = Optional.ofNullable(portfolio.get(stock.ticker)).orElse(0);
+            if (owned <= quantity) {
+                canSell = Boolean.FALSE;
+            }
+            totalPrice += (stock.price * quantity);
+        }
+        if (canSell) {
+            for (Map.Entry<Stock, Integer> entry : orderList.entrySet()) {
+                Stock stock = entry.getKey();
+                Integer quantity = entry.getValue();
+                int owned = Optional.ofNullable(portfolio.get(stock.ticker)).orElse(0);
+                portfolio.put(stock.ticker, owned - quantity);
+            }
             this.balance += totalPrice;
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;
         }
+    }
+
+    public Boolean userWithdraw(Integer amount) {
+        if (amount > this.balance) {
+            return Boolean.FALSE;
+        } else {
+            this.balance -= amount;
+            return Boolean.TRUE;
+        }
+    }
+
+    public Boolean userDeposit(Integer amount) {
+        this.balance += amount;
+        return Boolean.TRUE;
     }
 }

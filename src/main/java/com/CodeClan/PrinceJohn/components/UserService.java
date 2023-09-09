@@ -15,6 +15,7 @@ public class UserService {
 
     @Autowired
     StockRepository stockRepository;
+    private User user;
 
     public User getUser() {
         return user;
@@ -24,9 +25,7 @@ public class UserService {
         this.user = user;
     }
 
-    private User user;
-
-    public int portfolioValue () {
+    public int portfolioValue() {
         float total = 0;
         for (Map.Entry<String, Integer> entry : this.user.portfolio.entrySet()) {
             String stockTicker = entry.getKey();
@@ -40,12 +39,12 @@ public class UserService {
     public void updatePortfolioHistory() {
         LocalDate now = LocalDate.now();
         LocalDate lastUpdated = user.portfolioHistoryUpdated;
-        if (now.isAfter(lastUpdated)){
+        if (now.isAfter(lastUpdated)) {
             for (Map.Entry<String, Integer> entry : this.user.portfolio.entrySet()) {
                 String stockTicker = entry.getKey();
                 Stock stock = stockRepository.findByTicker(stockTicker).orElseThrow();
                 Integer quantity = entry.getValue();
-                for (lastUpdated = user.portfolioHistoryUpdated;lastUpdated.isBefore(now);) {
+                for (lastUpdated = user.portfolioHistoryUpdated; lastUpdated.isBefore(now); ) {
                     lastUpdated = lastUpdated.plusDays(1);
                     Float stockPrice = stock.priceHistory.get(lastUpdated);
                     Float interim = Optional.ofNullable(user.portfolioValueHistory.get(lastUpdated)).orElse(0F);

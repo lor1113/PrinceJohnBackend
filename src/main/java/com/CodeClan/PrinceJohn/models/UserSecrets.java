@@ -1,18 +1,41 @@
 package com.CodeClan.PrinceJohn.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
-import java.util.Random;
+import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
-@Table(name="user_secrets")
+@Table(name = "user_secrets")
 public class UserSecrets {
 
     @Id
     public Long Id;
+    public Boolean enabled2FA;
+    public Boolean loginDisabled;
+    public String secret2FA;
+    @ElementCollection
+    @MapKeyColumn(name = "device_id")
+    @Column(name = "device_secret", length = 500)
+    public Map<Long, String> transactionSecrets;
+    public String passwordHash;
+    public String lastTOTP;
+    public Long securityId;
+    @Column(unique = true)
+    public String email;
+
+    public UserSecrets(Long Id, String email) {
+        this.Id = Id;
+        this.email = email;
+        this.enabled2FA = Boolean.FALSE;
+        this.securityId = new SecureRandom().nextLong();
+        this.loginDisabled = Boolean.FALSE;
+        this.transactionSecrets = new HashMap<>();
+    }
+
+    public UserSecrets() {
+    }
 
     public Long getId() {
         return Id;
@@ -30,12 +53,12 @@ public class UserSecrets {
         this.secret2FA = secret2FA;
     }
 
-    public String getTransactionSecret() {
-        return transactionSecret;
+    public Map<Long, String> getTransactionSecrets() {
+        return transactionSecrets;
     }
 
-    public void setTransactionSecret(String transactionSecret) {
-        this.transactionSecret = transactionSecret;
+    public void setTransactionSecrets(Map<Long, String> transactionSecrets) {
+        this.transactionSecrets = transactionSecrets;
     }
 
     public String getPasswordHash() {
@@ -62,11 +85,21 @@ public class UserSecrets {
         this.email = email;
     }
 
-    public Boolean enabled2FA;
+    public Boolean getLoginDisabled() {
+        return loginDisabled;
+    }
 
-    public String secret2FA;
-    public String transactionSecret;
-    public String passwordHash;
+    public void setLoginDisabled(Boolean disabled) {
+        this.loginDisabled = disabled;
+    }
+
+    public String getLastTOTP() {
+        return lastTOTP;
+    }
+
+    public void setLastTOTP(String lastTOTP) {
+        this.lastTOTP = lastTOTP;
+    }
 
     public Long getSecurityId() {
         return securityId;
@@ -75,18 +108,4 @@ public class UserSecrets {
     public void setSecurityId(Long securityId) {
         this.securityId = securityId;
     }
-
-    public Long securityId;
-
-    @Column(unique=true)
-    public String email;
-
-    public UserSecrets (Long Id, String email) {
-        this.Id = Id;
-        this.email = email;
-        this.enabled2FA = Boolean.FALSE;
-        this.securityId = new Random().nextLong();
-    }
-
-    public UserSecrets () {}
 }

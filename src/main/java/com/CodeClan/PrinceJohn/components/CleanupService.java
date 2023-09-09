@@ -24,7 +24,7 @@ public class CleanupService {
         List<ProspectiveUser> usersToClean = prospectiveUserRepository.findAll();
         for (ProspectiveUser user : usersToClean) {
             long timePassed = user.hashDate.until(now, ChronoUnit.SECONDS);
-            if (timePassed > 7200) {
+            if (timePassed > 86400) {
                 prospectiveUserRepository.delete(user);
             }
         }

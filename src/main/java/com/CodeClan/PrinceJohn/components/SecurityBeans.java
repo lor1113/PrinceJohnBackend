@@ -36,7 +36,6 @@ public class SecurityBeans {
             EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
             RSAPublicKey rsa_public = (RSAPublicKey) keyFactory.generatePublic(publicKeySpec);
             RSAPrivateKey rsa_private = (RSAPrivateKey) keyFactory.generatePrivate(privateKeySpec);
-            System.out.println(rsa_private);
             RSAKey loaded = new RSAKey.Builder(rsa_public).privateKey(rsa_private).build();
             System.out.println("Loaded RSA Keys successfully");
             return Optional.ofNullable(loaded);
@@ -50,7 +49,6 @@ public class SecurityBeans {
         try {
             loadRSA();
         } catch (Exception e) {
-            System.out.println(e);
             System.out.println("Building new RSA keys");
             try {
                 KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
