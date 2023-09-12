@@ -12,10 +12,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -71,6 +68,11 @@ public class AppEndpointControllerNS {
         AllowedLogin allowedLogin = optionalAllowedLogin.get();
         allowedLogin.state = Boolean.TRUE;
         allowedLoginResository.save(allowedLogin);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping() {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

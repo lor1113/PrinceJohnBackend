@@ -9,12 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/appEndpoint/s1")
@@ -29,9 +36,20 @@ public class AppEndpointControllerS1 {
     UserService userService;
 
 
-    @GetMapping("/stockData")
-    public ResponseEntity<List<Stock>> getStocks() {
-        return new ResponseEntity<>(stockRepository.findAll(), HttpStatus.OK);
+    @GetMapping("/stockData/{date}")
+    public ResponseEntity<List<Stock>> getStocks(@PathVariable(required = false) Date date) {
+        List<Stock> stockList = stockRepository.findAll();
+        if (date != null){
+            LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            for (Stock stock : stockList) {
+                Map<LocalDate,Float> result = stock.priceHistory.entrySet()
+                        .stream()
+                        .filter(map -> map.getKey().isAfter(localDate))
+                        .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
+                stock.priceHistory = result;
+            }
+        }
+        return new ResponseEntity<>(stockList, HttpStatus.OK);
     }
 
     @GetMapping("/userData")
