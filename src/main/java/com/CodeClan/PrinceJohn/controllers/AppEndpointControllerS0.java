@@ -7,7 +7,6 @@ import com.CodeClan.PrinceJohn.models.ProspectiveUser;
 import com.CodeClan.PrinceJohn.repositories.AllowedLoginResository;
 import com.CodeClan.PrinceJohn.repositories.ProspectiveUserRepository;
 import com.CodeClan.PrinceJohn.repositories.UserRepository;
-import com.CodeClan.PrinceJohn.repositories.UserSecretsRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +28,6 @@ public class AppEndpointControllerS0 {
     ProspectiveUserRepository prospectiveUserRepository;
 
     @Autowired
-    UserSecretsRepository userSecretsRepository;
-
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -43,6 +39,7 @@ public class AppEndpointControllerS0 {
 
     @PostMapping("/userSignup")
     public ResponseEntity<?> userSignup(@Valid @RequestBody NewUser newUser) {
+        newUser.email = newUser.email.toLowerCase();
         if (userRepository.existsUserByEmail(newUser.email)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -61,6 +58,7 @@ public class AppEndpointControllerS0 {
         allowedLoginResository.save(login);
         String baseConfirm = "https://localhost:8080/appEndpoint/userConfirm/";
         emailService.sendEmail(hashed.email, baseConfirm + hashed.Id);
+        System.out.println("user signup success");
         return new ResponseEntity<>(baseConfirm + hashed.Id, HttpStatus.OK);
     }
 

@@ -12,7 +12,10 @@ import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -34,8 +37,8 @@ public class AppEndpointControllerNS {
     @Autowired
     AllowedLoginResository allowedLoginResository;
 
-    @PostMapping("/userConfirm/{code}")
-    public ResponseEntity<?> userConfirm(@Size(min = 2) @PathVariable String code) {
+    @GetMapping("/userConfirm/{code}")
+    public ResponseEntity<String> userConfirm(@Size(min = 2) @PathVariable String code) {
         Optional<ProspectiveUser> userToConfirm = prospectiveUserRepository.findById(code);
         if (userToConfirm.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -56,11 +59,11 @@ public class AppEndpointControllerNS {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        System.out.println("user confirmation success");
+        return new ResponseEntity<>("Email confirmed. Your account has been made.",HttpStatus.OK);
     }
-
-    @PostMapping("/userLoginConfirm/{code}")
-    public ResponseEntity<?> userLoginConfirm(@Size(min = 2) @PathVariable String code) {
+    @GetMapping("/userLoginConfirm/{code}")
+    public ResponseEntity<String> userLoginConfirm(@Size(min = 2) @PathVariable String code) {
         Optional<AllowedLogin> optionalAllowedLogin = allowedLoginResository.findByCode(code);
         if (optionalAllowedLogin.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -68,7 +71,8 @@ public class AppEndpointControllerNS {
         AllowedLogin allowedLogin = optionalAllowedLogin.get();
         allowedLogin.state = Boolean.TRUE;
         allowedLoginResository.save(allowedLogin);
-        return new ResponseEntity<>(HttpStatus.OK);
+        System.out.println("login request confirmation success");
+        return new ResponseEntity<>("Login request confirmed. You can log in now.", HttpStatus.OK);
     }
 
     @GetMapping("/ping")

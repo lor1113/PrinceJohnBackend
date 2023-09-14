@@ -2,7 +2,10 @@ package com.CodeClan.PrinceJohn.controllers;
 
 import com.CodeClan.PrinceJohn.components.UserService;
 import com.CodeClan.PrinceJohn.models.Stock;
+import com.CodeClan.PrinceJohn.models.StockBaseData;
+import com.CodeClan.PrinceJohn.models.StockMetadata;
 import com.CodeClan.PrinceJohn.models.User;
+import com.CodeClan.PrinceJohn.repositories.StockMetadataRepository;
 import com.CodeClan.PrinceJohn.repositories.StockRepository;
 import com.CodeClan.PrinceJohn.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
@@ -30,13 +32,16 @@ public class AppEndpointControllerS1 {
     StockRepository stockRepository;
 
     @Autowired
+    StockMetadataRepository stockMetadataRepository;
+
+    @Autowired
     UserRepository userRepository;
 
     @Autowired
     UserService userService;
 
 
-    @GetMapping("/stockData/{date}")
+    @GetMapping(value={"/stockData","/stockData/{date}"})
     public ResponseEntity<List<Stock>> getStocks(@PathVariable(required = false) Date date) {
         List<Stock> stockList = stockRepository.findAll();
         if (date != null){
@@ -49,7 +54,19 @@ public class AppEndpointControllerS1 {
                 stock.priceHistory = result;
             }
         }
+        System.out.println("stock data success");
         return new ResponseEntity<>(stockList, HttpStatus.OK);
+    }
+
+    @GetMapping("/stockBaseData")
+    public ResponseEntity<List<StockBaseData>> getStockBaseData() {
+        Optional<StockMetadata> stockMetadata = stockMetadataRepository.findById(1L);
+        if (stockMetadata.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        StockMetadata metadata = stockMetadata.get();
+        System.out.println("stock metadata success");
+        return new ResponseEntity<>(metadata.stockBaseDataList, HttpStatus.OK);
     }
 
     @GetMapping("/userData")
@@ -63,6 +80,7 @@ public class AppEndpointControllerS1 {
                 userService.updatePortfolioHistory();
                 User updatedUser = userService.getUser();
                 userRepository.save(updatedUser);
+                System.out.println("user data success");
                 return new ResponseEntity<>(updatedUser, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

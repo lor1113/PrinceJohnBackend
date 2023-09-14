@@ -1,0 +1,77 @@
+[
+  {
+    "ticker": "AAPL",
+    "fullName": "Apple Inc.",
+    "description": "Apple is the worlds largest technology company, with an installed userbase of over 1.5 billion."
+  },
+  {
+    "ticker": "AMD",
+    "fullName": "Advanced Micro Devices Inc.",
+    "description": "AMD is an American multinational semiconductor company based in Santa Clara, California."
+  },
+  {
+    "ticker": "AMZN",
+    "fullName": "Amazon.com Inc.",
+    "description": "Do you seriously need a description to tell you who Amazon is."
+  },
+  {
+    "ticker": "MSFT",
+    "fullName": "Microsoft Corporation",
+    "description": "Microsoft Corporation is an American multinational technology corporation headquartered in Redmond, Washington."
+  },
+  {
+    "ticker": "GOOGL",
+    "fullName": "Alphabet Inc.",
+    "description": "We own you."
+  },
+  {
+    "ticker": "NVDA",
+    "fullName": "Novideo Corporation",
+    "description": "AI"
+  },
+  {
+    "ticker": "COST",
+    "fullName": "Costco",
+    "description": "The co of cost"
+  },
+  {
+    "ticker": "CSCO",
+    "fullName": "Cisco",
+    "description": "Socks wen"
+  },
+  {
+    "ticker": "AMD",
+    "fullName": "Ayymd",
+    "description": "Novideo's greatest competitor"
+  },
+  {
+    "ticker": "NFLX",
+    "fullName": "Netflix inc.",
+    "description": "Please dont share passwords guys please"
+  },
+  {
+    "ticker": "INTC",
+    "fullName": "Intel Corporation",
+    "description": "Shintel ayylmao"
+  },
+  {
+    "ticker": "TMUS",
+    "fullName": "T-Mobile US",
+    "description": "Deutsche Telekom AG"
+  },
+  {
+    "ticker": "ATVI",
+    "fullName": "Activision Blizzard",
+    "description": "Make Love, Not Warcraft"
+  },
+  {
+    "ticker": "PEP",
+    "fullName": "PepsiCo Inc.",
+    "description": "Drink Pepsi"
+  },
+  {
+    "ticker": "SNPS",
+    "fullName": "Synopsys Inc.",
+    "description": "Synopsys is an American electronic design automation company headquartered in Sunnyvale, California."
+  }
+]

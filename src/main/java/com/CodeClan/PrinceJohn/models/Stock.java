@@ -18,6 +18,16 @@ public class Stock {
     public String ticker;
     public Float price;
 
+    public Float getDelta() {
+        return delta;
+    }
+
+    public void setDelta(Float delta) {
+        this.delta = delta;
+    }
+
+    public Float delta;
+
     public Stock(String ticker, Float price) {
         this.ticker = ticker;
         this.price = price;

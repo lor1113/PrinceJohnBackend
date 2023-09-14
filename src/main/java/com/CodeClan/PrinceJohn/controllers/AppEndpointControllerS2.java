@@ -32,6 +32,7 @@ public class AppEndpointControllerS2 {
             try {
                 UserSecrets userSecrets = secretsOut.get();
                 String newToken = jwtTokenService.generateAccessToken(userSecrets, Boolean.FALSE).orElseThrow();
+                System.out.println("access token success");
                 return new ResponseEntity<>(newToken, HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

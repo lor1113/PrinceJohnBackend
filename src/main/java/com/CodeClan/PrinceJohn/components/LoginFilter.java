@@ -56,6 +56,7 @@ public class LoginFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+        user_email = user_email.toLowerCase();
         Optional<UserSecrets> userSecretsOptional = userSecretsRepository.findByEmail(user_email);
         if (userSecretsOptional.isEmpty()) {
             System.out.println("Bad user email");
@@ -73,15 +74,20 @@ public class LoginFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        if (userSecrets.enabled2FA) {
+        String path = request.getRequestURI();
+        AntPathMatcher matcher = new AntPathMatcher();
+        boolean check2FA = userSecrets.enabled2FA;
+        boolean newLogin = matcher.match("/appEndpoint/s4/newLogin", path);
+        if (newLogin) {
+            System.out.println("Skipping 2FA check for /newLogin endpoint");
+            check2FA = false;
+        }
+        if (check2FA) {
             String totpCode;
-            TimeProvider timeProvider = new SystemTimeProvider();
-            CodeGenerator codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.SHA512, 8);
-            CodeVerifier codeVerifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
             totpCode = request.getHeader("X-User-TOTP");
             if (totpCode == null) {
                 System.out.println("Missing TOTP header");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
             if (totpCode.equals(userSecrets.getLastTOTP())) {
@@ -89,6 +95,9 @@ public class LoginFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }
+            TimeProvider timeProvider = new SystemTimeProvider();
+            CodeGenerator codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.SHA512, 8);
+            CodeVerifier codeVerifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
             boolean totpMatch = codeVerifier.isValidCode(userSecrets.secret2FA, totpCode);
             if (!totpMatch) {
                 System.out.println("TOTP code mismatch");

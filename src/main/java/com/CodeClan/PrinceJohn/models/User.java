@@ -34,7 +34,7 @@ public class User {
     public User(String username, String email, LocalDate birthday) {
         this.username = username;
         this.birthday = birthday;
-        this.email = email;
+        this.email = email.toLowerCase();
         this.balance = 0F;
         this.portfolio = new HashMap<>();
         this.portfolioValueHistory = new HashMap<>();

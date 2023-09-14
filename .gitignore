@@ -36,3 +36,5 @@ build/
 /src/main/resources/rsa_private.key
 /src/main/resources/rsa_public.key
 /src/main/resources/springboot.p12
+/src/main/resources/cert.p12
+/src/test/resources/application.properties

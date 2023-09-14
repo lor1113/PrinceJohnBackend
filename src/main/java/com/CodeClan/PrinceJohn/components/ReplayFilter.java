@@ -20,12 +20,13 @@ import java.util.List;
 @Order(0)
 public class ReplayFilter extends OncePerRequestFilter {
 
-    private static final int messageLife = 2;
+    private static final int messageLifeForwards = 5;
+    private static final int messageLifeBackwards = 2;
     private final List<Long> list1 = new ArrayList<>();
     private final List<Long> list2 = new ArrayList<>();
     private Boolean toggle = Boolean.TRUE;
 
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(fixedDelay = 10000)
     public void iterator() {
         if (toggle) {
             list2.clear();
@@ -50,12 +51,14 @@ public class ReplayFilter extends OncePerRequestFilter {
             return;
         }
         long unixTime = System.currentTimeMillis() / 1000L;
-        if (sendDate > unixTime) {
+        if (sendDate > (unixTime + messageLifeBackwards)) {
             System.out.println("what");
+            System.out.println(sendDate);
+            System.out.println(unixTime);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if ((unixTime - sendDate) > messageLife) {
+        if ((unixTime - sendDate) > messageLifeForwards) {
             System.out.println("Message timed out");
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;

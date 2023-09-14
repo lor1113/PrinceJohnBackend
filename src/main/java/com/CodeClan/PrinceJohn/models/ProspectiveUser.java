@@ -23,7 +23,7 @@ public class ProspectiveUser {
 
     public ProspectiveUser(NewUser newUser) {
         this.username = newUser.username;
-        this.email = newUser.email;
+        this.email = newUser.email.toLowerCase();
         this.birthday = newUser.birthday;
         newHash();
     }

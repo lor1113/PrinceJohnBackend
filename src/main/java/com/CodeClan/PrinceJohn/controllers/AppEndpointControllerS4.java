@@ -61,13 +61,15 @@ public class AppEndpointControllerS4 {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         String jwtToken = accessToken.get();
+        System.out.println("repeat login success");
         return new ResponseEntity<>(jwtToken, HttpStatus.OK);
     }
 
     @PostMapping("/requestNewLogin")
     public ResponseEntity<String> newLoginRequest(@Valid @RequestBody NewLoginRequest request, Principal principal) {
+        request.email = request.email.toLowerCase();
         SecureRandom rand = new SecureRandom();
-        Long newCode = (rand.nextLong() * -1) + 10;
+        Long newCode = Math.abs(rand.nextLong()) + 10;
         String baseURL = "https://localhost:8080/appEndpoint/userLoginConfirm/";
         AllowedLogin login = new AllowedLogin(request.loginDeviceID, newCode, request.email);
         allowedLoginResository.save(login);
@@ -78,8 +80,6 @@ public class AppEndpointControllerS4 {
     @PostMapping("/newLogin")
     public ResponseEntity<NewLoginSuccess> newLogin(@RequestHeader("X-Operation-Id") Long sendID,
                                                     @Valid @RequestBody NewLogin newLogin, Principal principal) {
-        System.out.println(newLogin.operation_id);
-        System.out.println(sendID);
         if (!(sendID == newLogin.operation_id)) {
             System.out.println("operation ID mismatch");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -110,7 +110,8 @@ public class AppEndpointControllerS4 {
             System.out.println("failed device id");
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        if (!(Objects.equals(allowedLogin.email, newLogin.email))) {
+        String email = newLogin.email.toLowerCase();
+        if (!(Objects.equals(allowedLogin.email, email))) {
             System.out.println("failed email");
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
@@ -129,6 +130,7 @@ public class AppEndpointControllerS4 {
         userSecrets.transactionSecrets.put(deviceID, newLogin.secret);
         userSecretsRepository.save(userSecrets);
         NewLoginSuccess newLoginSuccess = new NewLoginSuccess(jwtToken, deviceID);
+        System.out.println("new login success");
         return new ResponseEntity<>(newLoginSuccess, HttpStatus.OK);
     }
 

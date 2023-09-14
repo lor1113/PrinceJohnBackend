@@ -44,7 +44,7 @@ public class PrinceJohnDBSetup {
 
     @Test
     public void setupUserOne() throws IOException {
-        User testUser = new User("Lorenzo", "Lorenzocurcio2@gmail.com", LocalDate.of(2001, 4, 7));
+        User testUser = new User("Lorenzo", "lorenzocurcio2@gmail.com", LocalDate.of(2001, 4, 7));
         userRepository.save(testUser);
         UserSecrets userSecrets = new UserSecrets(testUser.getId(), testUser.email);
         String content = Files.readString(Path.of("src/test/java/com/CodeClan/PrinceJohn/rsaPublic1.txt"));
